@@ -167,12 +167,21 @@ impl std::fmt::Display for PortBinding {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[allow(non_snake_case)]
+pub struct DeviceStruct{
+    pub CgroupPermissions: String,
+    pub PathInContainer: String,
+    pub PathOnHost: String
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[allow(non_snake_case)]
 pub struct HostConfigCreate {
     pub NetworkMode: Option<String>,
     pub PublishAllPorts: Option<bool>,
     pub PortBindings: Option<HashMap<String, Vec<PortBinding>>>,
+    pub Devices: Option<Vec<DeviceStruct>>
 }
 
 impl Clone for HostConfigCreate {
@@ -181,6 +190,7 @@ impl Clone for HostConfigCreate {
             NetworkMode: self.NetworkMode.clone(),
             PublishAllPorts: self.PublishAllPorts.clone(),
             PortBindings: self.PortBindings.clone(),
+            Devices: self.Devices.clone(),
         }
     }
 }

@@ -12,3 +12,5 @@ Therefore, this repo contains the required updated to support this functionality
 Relevant [MVP](https://github.com/edgeless-project/edgeless.git) issue: [https://github.com/edgeless-project/edgeless/issues/226](https://github.com/edgeless-project/edgeless/issues/226)
 
 Original `rs-docker` [README.md](./README-original.md)
+
+Also, in this patched version, the `docker stop` command is forced to have a grace time of 0 seconds.

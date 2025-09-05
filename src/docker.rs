@@ -88,28 +88,32 @@ impl Docker {
             .header("Accept", "application/json")
             .method(method)
             .body(Body::from(file))
-            .expect("failed to build request");  
+            .expect("failed to build request");
         match Handle::try_current() {
             Ok(_) => tokio::task::block_in_place(|| {
-                tokio::runtime::Runtime::new()
-                    .unwrap()
-                    .block_on(
-                        match self.protocol {
-                            Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
-                            Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
-                        }
-                        .and_then(|res| hyper::body::to_bytes(res.into_body()))
-                        .map(|body| String::from_utf8(body.expect("Body should not have an error").to_vec()).unwrap())
-                    )
-            }),
-            Err(_) => Runtime::new().unwrap().block_on(
+                tokio::runtime::Runtime::new().unwrap().block_on(
                     match self.protocol {
                         Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
                         Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
                     }
                     .and_then(|res| hyper::body::to_bytes(res.into_body()))
-                    .map(|body| String::from_utf8(body.expect("Body should not have an error").to_vec()).unwrap()),
-            )
+                    .map(|body| {
+                        String::from_utf8(body.expect("Body should not have an error").to_vec())
+                            .unwrap()
+                    }),
+                )
+            }),
+            Err(_) => Runtime::new().unwrap().block_on(
+                match self.protocol {
+                    Protocol::UNIX => self.hyperlocal_client.as_ref().unwrap().request(req),
+                    Protocol::TCP => self.hyper_client.as_ref().unwrap().request(req),
+                }
+                .and_then(|res| hyper::body::to_bytes(res.into_body()))
+                .map(|body| {
+                    String::from_utf8(body.expect("Body should not have an error").to_vec())
+                        .unwrap()
+                }),
+            ),
         }
     }
 
@@ -197,7 +201,7 @@ impl Docker {
     pub fn stop_container(&mut self, id_or_name: &str) -> std::io::Result<String> {
         let body = self.request(
             Method::POST,
-            &format!("/containers/{}/stop", id_or_name),
+            &format!("/containers/{}/stop?t=0", id_or_name),
             "".to_string(),
         );
 

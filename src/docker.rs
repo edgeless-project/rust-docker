@@ -89,6 +89,7 @@ impl Docker {
             .method(method)
             .body(Body::from(file))
             .expect("failed to build request");
+        println!("XXX {:?}", req.uri().path_and_query());
         match Handle::try_current() {
             Ok(_) => tokio::task::block_in_place(|| {
                 tokio::runtime::Runtime::new().unwrap().block_on(
